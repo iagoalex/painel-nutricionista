@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Nutricionista - Emissão de Documentos</title>
+  
+  <!-- Fontes Google -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Biblioteca html2pdf.js para geração de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- TELA DE LOGIN -->
+<div class="login-wrapper" id="loginScreen">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>Painel do Nutricionista</h2>
+      <p>Acesse com suas credenciais para continuar</p>
+    </div>
+    
+    <form class="login-form" onsubmit="event.preventDefault(); autenticar();">
+      <div class="form-group">
+        <label for="login_user">Usuário</label>
+        <input type="text" id="login_user" placeholder="Digite seu usuário" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="login_pass">Senha</label>
+        <input type="password" id="login_pass" placeholder="Digite sua senha" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-login" id="btnLogin">
+        <span id="btnText">Entrar no Sistema</span>
+      </button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+  </div>
+</div>
+
+<header class="app-header">
+    <h1>PAINEL NUTRIONAL</h1>
+    <span>Gerador de PDF Personalizado</span>
+  </header>
+
+  <div class="container">
+    
+    <!-- DADOS DO NUTRICIONISTA & PACIENTE -->
+    <div class="nutri-card">
+      <h2>1. Dados Gerais (Nutricionista, Logotipo & Paciente)</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Logo do Nutricionista</label>
+          <input type="file" id="nutri_logo_file" accept="image/*" onchange="carregarLogo(event)">
+        </div>
+        <div class="form-group">
+          <label>Nome do Nutricionista</label>
+          <input type="text" id="nutri_nome" value="Piethro Stephanno M. T. Viana">
+        </div>
+        <div class="form-group">
+          <label>CRN</label>
+          <input type="text" id="nutri_crn" value="CRN-48860">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="text" id="nutri_email" value="piethronutricionista@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Telefone / WhatsApp</label>
+          <input type="text" id="nutri_fone" value="(82) 99805-9336">
+        </div>
+        <div class="form-group">
+          <label>Instagram</label>
+          <input type="text" id="nutri_insta" value="@piethr">
+        </div>
+        <div class="form-group">
+          <label>Nome do Paciente</label>
+          <input type="text" id="paciente_nome" placeholder="Digite o nome do paciente...">
+        </div>
+        <div class="form-group">
+          <label>Data de Emissão (Avaliação Atual)</label>
+          <input type="date" id="doc_data">
+        </div>
+      </div>
+    </div>
+
+    <!-- ABAS DE NAVEGAÇÃO -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="openTab('antropometria', event)">Evolução Antropométrica</button>
+      <button class="tab-btn" onclick="openTab('exames', event)">Solicitação de Exames</button>
+      <button class="tab-btn" onclick="openTab('plano', event)">Plano Alimentar</button>
+    </div>
+
+    <!-- ABA 1: EVOLUÇÃO ANTROPOMÉTRICA -->
+    <div id="antropometria" class="tab-content active">
+      <h3>Evolução Antropométrica</h3>
+      <div class="form-grid" style="margin-top: 15px;">
+        <div class="form-group">
+          <label>Data da Avaliação Anterior (Opcional)</label>
+          <input type="date" id="antro_data_anterior">
+        </div>
+        <div class="form-group">
+          <label>Subtítulo / Observações Adicionais</label>
+          <input type="text" id="antro_sub" placeholder="Ex: 30 anos · Altura 1,73 m">
+        </div>
+      </div>
+
+      <table class="data-table" id="table-antropometria">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Indicador</th>
+            <th style="width: 20%;">Avaliação Anterior</th>
+            <th style="width: 20%;">Avaliação Atual</th>
+            <th style="width: 18%;">Referência</th>
+            <th style="width: 17%;">Evolução</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" placeholder="Ex: Peso"></td>
+            <td><input type="text" placeholder="Ex: 91 kg"></td>
+            <td><input type="text" placeholder="Ex: 88,3 kg"></td>
+            <td><input type="text" placeholder="Ex: 55 – 74 kg"></td>
+            <td><input type="text" placeholder="Ex: −2,7 kg"></td>
+          </tr>
+          <tr>
+            <td><input type="text" placeholder="Ex: IMC"></td>
+            <td><input type="text" placeholder="Ex: 30,41"></td>
+            <td><input type="text" placeholder="Ex: 29,50"></td>
+            <td><input type="text" placeholder="Ex: 18,5 – 24,9"></td>
+            <td><input type="text" placeholder="Ex: Obesidade I → Sobrepeso"></td>
+          </tr>
+          <tr>
+            <td><input type="text" placeholder="Ex: Cintura"></td>
+            <td><input type="text" placeholder="Ex: 98 cm"></td>
+            <td><input type="text" placeholder="Ex: 96 cm"></td>
+            <td><input type="text" placeholder="Ex: < 94 cm"></td>
+            <td><input type="text" placeholder="Ex: −2 cm"></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn btn-secondary" onclick="addRow('table-antropometria', 5)">+ Adicionar Linha</button>
+
+      <div class="form-group" style="margin-top: 15px;">
+        <label>Nota de Rodapé / Observação</label>
+        <textarea id="antro_nota" rows="2" placeholder="Ex: *Valores estimados por antropometria, sujeitos à margem do método."></textarea>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn" onclick="gerarPDF('antropometria')">📄 Gerar PDF de Evolução Antropométrica</button>
+      </div>
+    </div>
+
+    <!-- ABA 2: SOLICITAÇÃO DE EXAMES -->
+    <div id="exames" class="tab-content">
+      <h3>Solicitação de Exames Laboratoriais</h3>
+      <div class="form-group" style="margin-top: 15px;">
+        <label>Lista de Exames (Um por linha)</label>
+        <textarea id="exames_lista" rows="10" placeholder="Ex:&#10;Hemograma completo&#10;Glicemia de jejum&#10;Hemoglobina glicada (HbA1c)&#10;Lipidograma completo&#10;Vitamina D3"></textarea>
+      </div>
+
+      <div class="form-group" style="margin-top: 15px;">
+        <label>Objetivo da Solicitação</label>
+        <textarea id="exames_objetivo" rows="3" placeholder="Ex: Objetivo: complementar a avaliação nutricional e identificar possíveis deficiências nutricionais."></textarea>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn" onclick="gerarPDF('exames')">📄 Gerar PDF de Exames</button>
+      </div>
+    </div>
+
+    <!-- ABA 3: PLANO ALIMENTAR -->
+    <div id="plano" class="tab-content">
+      <h3>Plano Alimentar</h3>
+      
+      <div class="form-group" style="margin-top: 15px;">
+        <label>Observação Geral / Meta do Plano</label>
+        <textarea id="plano_obs" rows="2" placeholder="Ex: Plano focado na reeducação alimentar, focado na perda de gordura e distribuição adequada de refeições."></textarea>
+      </div>
+
+      <table class="data-table" id="table-plano">
+        <thead>
+          <tr>
+            <th style="width: 22%;">Horário/Refeição</th>
+            <th style="width: 43%;">Alimentos / Opções</th>
+            <th style="width: 35%;">Orientações / Recomendações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" placeholder="Ex: 06:00 - Café da Manhã"></td>
+            <td><textarea placeholder="Ex: Ovo cozido (2 un) OU Frango grelhado (80g)&#10;Pão integral (1 fatia)"></textarea></td>
+            <td><textarea placeholder="Ex: Evitar margarina com gordura trans. Priorizar pães com farinha integral no 1º ingrediente."></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" placeholder="Ex: 12:30 - Almoço"></td>
+            <td><textarea placeholder="Ex: Carne bovina (150g)&#10;Arroz integral (100g)&#10;Feijão (1 concha)"></textarea></td>
+            <td><textarea placeholder="Ex: Priorize cortes magros como patinho ou coxão mole. Salada de folhas à vontade."></textarea></td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn btn-secondary" onclick="addRowPlano('table-plano')">+ Adicionar Refeição</button>
+
+      <div class="actions-bar">
+        <button class="btn" onclick="gerarPDF('plano')">📄 Gerar PDF do Plano Alimentar</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ELEMENTO OTIMIZADO PARA CAPTURA ALINHADA NO TOPO -->
+  <div class="pdf-render-wrapper" id="pdfWrapper">
+    <div id="pdf-render" class="pdf-page">
+      <div>
+        <div class="pdf-header">
+          <div class="pdf-brand-wrapper">
+            <img id="pdf_logo_img" class="pdf-logo" src="" alt="Logo">
+            <div class="brand">
+              <h1 id="pdf_h_nome">PIETHRO STEPHANNO</h1>
+              <p id="pdf_h_crn">NUTRICIONISTA | CRN-48860</p>
+            </div>
+          </div>
+          <div class="contact-info" id="pdf_h_contato"></div>
+        </div>
+
+        <div class="pdf-patient-info">
+          <div class="title">PACIENTE</div>
+          <div class="name" id="pdf_p_nome">&nbsp;</div>
+          <div class="details" id="pdf_p_details">&nbsp;</div>
+        </div>
+
+        <div id="pdf-dynamic-content"></div>
+      </div>
+
+      <div class="pdf-footer">
+        <div class="pdf-signature-area">
+          <div class="signature-box">
+            <div class="signature-line"></div>
+            <p id="pdf_sig_nome">Piethro Stephanno M. T. Viana</p>
+            <span>Nutricionista</span>
+            <span id="pdf_sig_crn">CRN 48860</span>
+          </div>
+
+        </div>
+        <div class="pdf-footer-bar">
+          <span id="pdf_f_email"></span>
+          <span id="pdf_f_fone"></span>
+          <span id="pdf_f_insta"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- LÓGICA E SCRIPTS DO SISTEMA -->
+  <script src="script.js"></script>
+
+</body>
+</html>
